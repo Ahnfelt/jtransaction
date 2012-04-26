@@ -43,6 +43,7 @@ public class Transaction {
 
                         retry = true;
                         transaction.get().waitForRetry();
+                        transaction.set(new Transaction());
 
                     }
 
