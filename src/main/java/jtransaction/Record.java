@@ -27,6 +27,16 @@ public class Record implements InvocationHandler {
                 new Record());
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T shallowCopy(T record) {
+        Record copy = new Record();
+        copy.fieldValues = ((Record) Proxy.getInvocationHandler(create(record.getClass()))).fieldValues;
+        return (T) Proxy.newProxyInstance(
+                Record.class.getClassLoader(),
+                new Class<?>[] { record.getClass() },
+                copy);
+    }
+
 
     public Object invoke(Object object, Method method, Object[] objects) throws Throwable {
         if(!method.getDeclaringClass().equals(Object.class)) {
