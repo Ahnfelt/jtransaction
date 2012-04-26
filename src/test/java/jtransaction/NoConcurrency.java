@@ -23,10 +23,12 @@ public class NoConcurrency {
         }});
 
 
+        final Slot<Integer> slot = Record.slot(0);
         final long amount = 200;
 
         Transaction.run(new Runnable(){public void run(){
 
+            slot.set(10);
             if(anna.getCredits() >= amount) {
                 anna.setCredits(anna.getCredits() - amount);
                 birgit.setCredits(birgit.getCredits() + amount);
@@ -37,6 +39,7 @@ public class NoConcurrency {
         }});
 
 
+        System.out.println("Slot:" + slot.get());
         System.out.println("Anna's credits:   " + anna.getCredits());
         System.out.println("Birgit's credits: " + birgit.getCredits());
 

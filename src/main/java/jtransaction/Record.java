@@ -97,4 +97,13 @@ public class Record implements InvocationHandler {
         }
         return transaction;
     }
+
+
+    @SuppressWarnings("unchecked")
+    public static <T> Slot<T> slot(T value) {
+        Slot<T> slot = create(Slot.class);
+        Record internal = (Record) Proxy.getInvocationHandler(slot);
+        internal.fieldValues = Collections.singletonMap("", (Object) value);
+        return slot;
+    }
 }
