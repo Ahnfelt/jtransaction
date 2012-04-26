@@ -23,6 +23,9 @@ public class Retry {
 
             Transaction.run(new Runnable(){public void run(){
 
+                // Normally non-transactional calls like this inside a transaction
+                // would be a bug, but in this case we actually want to observe
+                // how many times the transaction is tried (likely 2 times)
                 System.out.println("Trying...");
 
                 if(!done.get()) Transaction.retry();

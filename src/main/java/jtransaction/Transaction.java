@@ -33,11 +33,12 @@ public class Transaction {
 
         } else {
 
-            transaction.set(new Transaction());
             try {
 
                 boolean retry;
                 do {
+
+                    transaction.set(new Transaction());
 
                     retry = false;
                     try {
@@ -48,7 +49,6 @@ public class Transaction {
 
                         retry = true;
                         transaction.get().waitForRetry();
-                        transaction.set(new Transaction());
 
                     }
 
