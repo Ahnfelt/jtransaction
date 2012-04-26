@@ -12,6 +12,11 @@ public class Transaction {
     private static class RetryException extends RuntimeException {}
 
 
+    public static void retry() {
+        throw new RetryException();
+    }
+
+
     public static class RollbackException extends RuntimeException {}
 
 
@@ -63,7 +68,7 @@ public class Transaction {
         final Object latch = new Object();
 
         for(Record record: accessed.keySet()) {
-            record.latches.put(latch, null);
+            record.latches.put(latch, latch);
         }
 
         try {
