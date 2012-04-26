@@ -23,6 +23,8 @@ public class Retry {
 
             Transaction.run(new Runnable(){public void run(){
 
+                System.out.println("Trying...");
+
                 if(!done.get()) Transaction.retry();
 
             }});
