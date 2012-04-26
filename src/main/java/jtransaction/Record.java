@@ -6,6 +6,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,7 +18,8 @@ public class Record implements InvocationHandler {
     private final Class type;
     final long id = nextId.getAndIncrement();
     final Lock lock = new ReentrantLock();
-    Map<String, Object> fieldValues = Collections.emptyMap();
+    ConcurrentHashMap<Object, Object> latches = new ConcurrentHashMap<Object, Object>();
+    volatile Map<String, Object> fieldValues = Collections.emptyMap();
 
 
     @SuppressWarnings("unchecked")
@@ -80,15 +82,26 @@ public class Record implements InvocationHandler {
 
     private void set(String fieldName, Object value) {
         Transaction transaction = addToTransaction();
+
         if(transaction == null) {
+
             Map<String, Object> newValues = new HashMap<String, Object>(fieldValues);
             newValues.put(fieldName, value);
             fieldValues = newValues;
+
         } else {
+
             if(!transaction.written.containsKey(this)) {
                 transaction.written.put(this, new HashMap<String, Object>());
             }
+
             transaction.written.get(this).put(fieldName, value);
+        }
+
+        for(Object latch: latches.keySet()) {
+            synchronized(latch) {
+                latch.notifyAll();
+            }
         }
     }
 
