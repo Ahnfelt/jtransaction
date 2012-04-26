@@ -9,12 +9,10 @@ public class Transaction {
     Map<Record, Map<String, Object>> written = new HashMap<Record, Map<String, Object>>();
 
 
-    public static class NotInTransactionException extends RuntimeException {}
     public static class RollbackException extends RuntimeException {}
 
 
     public static void rollback() {
-        if(transaction.get() == null) throw new NotInTransactionException();
         throw new RollbackException();
     }
 
@@ -54,8 +52,7 @@ public class Transaction {
             }
 
             for(Map.Entry<Record, Map<String, Object>> entry: written.entrySet()) {
-                Map<String, Object> newValues = new HashMap<String, Object>();
-                newValues.putAll(accessed.get(entry.getKey()));
+                Map<String, Object> newValues = new HashMap<String, Object>(accessed.get(entry.getKey()));
                 newValues.putAll(entry.getValue());
                 entry.getKey().fieldValues = newValues;
             }

@@ -13,17 +13,9 @@ public class NoConcurrency {
 
         final Person anna = Record.create(Person.class);
         final Person birgit = Record.create(Person.class);
-
-
-        Transaction.run(new Runnable(){public void run(){
-
-            anna.setCredits(500);
-            birgit.setCredits(0);
-
-        }});
-
-
         final long amount = 200;
+        anna.setCredits(500);
+        birgit.setCredits(0);
 
         Transaction.run(new Runnable(){public void run(){
 

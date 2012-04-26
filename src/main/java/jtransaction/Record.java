@@ -80,11 +80,16 @@ public class Record implements InvocationHandler {
 
     private void set(String fieldName, Object value) {
         Transaction transaction = addToTransaction();
-        if(transaction == null) throw new Transaction.NotInTransactionException();
-        if(!transaction.written.containsKey(this)) {
-            transaction.written.put(this, new HashMap<String, Object>());
+        if(transaction == null) {
+            Map<String, Object> newValues = new HashMap<String, Object>(fieldValues);
+            newValues.put(fieldName, value);
+            fieldValues = newValues;
+        } else {
+            if(!transaction.written.containsKey(this)) {
+                transaction.written.put(this, new HashMap<String, Object>());
+            }
+            transaction.written.get(this).put(fieldName, value);
         }
-        transaction.written.get(this).put(fieldName, value);
     }
 
 
