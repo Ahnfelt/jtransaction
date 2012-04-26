@@ -37,7 +37,6 @@ public class NoConcurrency {
         }});
 
 
-
         System.out.println("Anna's credits:   " + anna.getCredits());
         System.out.println("Birgit's credits: " + birgit.getCredits());
 

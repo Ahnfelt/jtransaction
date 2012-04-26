@@ -31,6 +31,7 @@ public class Record implements InvocationHandler {
     @SuppressWarnings("unchecked")
     public static <T> T shallowCopy(T record) {
         Record internal = (Record) Proxy.getInvocationHandler(record);
+        internal.addToTransaction();
         Record copy = new Record(internal.type);
         copy.fieldValues = internal.fieldValues;
         return (T) Proxy.newProxyInstance(
