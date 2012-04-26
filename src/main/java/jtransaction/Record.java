@@ -14,6 +14,7 @@ public class Record implements InvocationHandler {
 
     private static final AtomicLong nextId = new AtomicLong();
 
+    private final Class type;
     final long id = nextId.getAndIncrement();
     final Lock lock = new ReentrantLock();
     Map<String, Object> fieldValues = Collections.emptyMap();
@@ -24,17 +25,23 @@ public class Record implements InvocationHandler {
         return (T) Proxy.newProxyInstance(
                 Record.class.getClassLoader(),
                 new Class<?>[] { type },
-                new Record());
+                new Record(type));
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T shallowCopy(T record) {
-        Record copy = new Record();
-        copy.fieldValues = ((Record) Proxy.getInvocationHandler(create(record.getClass()))).fieldValues;
+        Record internal = (Record) Proxy.getInvocationHandler(record);
+        Record copy = new Record(internal.type);
+        copy.fieldValues = internal.fieldValues;
         return (T) Proxy.newProxyInstance(
                 Record.class.getClassLoader(),
-                new Class<?>[] { record.getClass() },
+                new Class<?>[] { internal.type },
                 copy);
+    }
+
+
+    public Record(Class type) {
+        this.type = type;
     }
 
 
