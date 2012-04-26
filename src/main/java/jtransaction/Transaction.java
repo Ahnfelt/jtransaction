@@ -10,6 +10,8 @@ public class Transaction {
 
 
     private static class RetryException extends RuntimeException {}
+
+
     public static class RollbackException extends RuntimeException {}
 
 
@@ -129,11 +131,7 @@ public class Transaction {
 
         List<Record> lockOrder = new ArrayList<Record>(accessed.keySet());
 
-        Collections.sort(lockOrder, new Comparator<Record>() {
-            public int compare(Record a, Record b) {
-                return new Long(a.id).compareTo(b.id);
-            }
-        });
+        Collections.sort(lockOrder, byId);
 
         for(Record record: lockOrder) {
             record.lock.lock();
@@ -152,4 +150,11 @@ public class Transaction {
 
         }
     }
+
+
+    private static final Comparator<Record> byId = new Comparator<Record>() {
+        public int compare(Record a, Record b) {
+            return new Long(a.id).compareTo(b.id);
+        }
+    };
 }
