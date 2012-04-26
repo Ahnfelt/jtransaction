@@ -28,6 +28,7 @@ public class Record implements InvocationHandler {
                 new Record(type));
     }
 
+
     @SuppressWarnings("unchecked")
     public static <T> T shallowCopy(T record) {
         Record internal = (Record) Proxy.getInvocationHandler(record);
@@ -38,6 +39,15 @@ public class Record implements InvocationHandler {
                 Record.class.getClassLoader(),
                 new Class<?>[] { internal.type },
                 copy);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static <T> Slot<T> slot(T value) {
+        Slot<T> slot = create(Slot.class);
+        Record internal = (Record) Proxy.getInvocationHandler(slot);
+        internal.fieldValues = Collections.singletonMap("", (Object) value);
+        return slot;
     }
 
 
@@ -96,14 +106,5 @@ public class Record implements InvocationHandler {
             transaction.accessed.put(this, fieldValues);
         }
         return transaction;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public static <T> Slot<T> slot(T value) {
-        Slot<T> slot = create(Slot.class);
-        Record internal = (Record) Proxy.getInvocationHandler(slot);
-        internal.fieldValues = Collections.singletonMap("", (Object) value);
-        return slot;
     }
 }
