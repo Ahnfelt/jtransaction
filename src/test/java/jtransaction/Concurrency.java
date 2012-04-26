@@ -12,9 +12,7 @@ public class Concurrency {
     public static void main(String[] arguments) {
 
         final Person anna = Record.create(Person.class);
-        anna.setCredits(20);
-
-        final Slot<Boolean> ready = Record.slot(false);
+        anna.setCredits(0);
 
         for(int i = 0; i < 50; i++) {
 
@@ -22,10 +20,10 @@ public class Concurrency {
 
                 Transaction.run(new Runnable(){public void run(){
 
-                    if(!ready.get()) Transaction.retry();
+                    anna.setCredits(anna.getCredits() - 2);
 
-                    if(anna.getCredits() >= 2) {
-                        anna.setCredits(anna.getCredits() - 2);
+                    if(anna.getCredits() < 0 || anna.getCredits() > 2) {
+                        Transaction.retry();
                     }
 
                 }});
@@ -44,9 +42,11 @@ public class Concurrency {
 
                 Transaction.run(new Runnable(){public void run(){
 
-                    if(!ready.get()) Transaction.retry();
-
                     anna.setCredits(anna.getCredits() + 1);
+
+                    if(anna.getCredits() < 0 || anna.getCredits() > 2) {
+                        Transaction.retry();
+                    }
 
                 }});
 
@@ -57,7 +57,5 @@ public class Concurrency {
             }}).start();
 
         }
-
-        ready.set(true);
     }
 }

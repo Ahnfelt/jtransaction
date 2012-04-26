@@ -112,14 +112,14 @@ public class Transaction {
         lockAccessedRecords(new Runnable() {
             public void run() {
 
-                for (Map.Entry<Record, Map<String, Object>> entry : accessed.entrySet()) {
+                for(Map.Entry<Record, Map<String, Object>> entry: accessed.entrySet()) {
                     if (entry.getKey().fieldValues != entry.getValue()) {
                         result[0] = false;
                         return;
                     }
                 }
 
-                for (Map.Entry<Record, Map<String, Object>> entry : written.entrySet()) {
+                for(Map.Entry<Record, Map<String, Object>> entry: written.entrySet()) {
                     Map<String, Object> newValues = new HashMap<String, Object>(accessed.get(entry.getKey()));
                     newValues.putAll(entry.getValue());
                     entry.getKey().fieldValues = newValues;
@@ -128,6 +128,10 @@ public class Transaction {
 
             }
         });
+
+        for(Record record: written.keySet()) {
+            record.notifyLatches();
+        }
 
         return result[0];
     }

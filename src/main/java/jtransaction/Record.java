@@ -88,6 +88,7 @@ public class Record implements InvocationHandler {
             Map<String, Object> newValues = new HashMap<String, Object>(fieldValues);
             newValues.put(fieldName, value);
             fieldValues = newValues;
+            notifyLatches();
 
         } else {
 
@@ -97,14 +98,7 @@ public class Record implements InvocationHandler {
 
             transaction.written.get(this).put(fieldName, value);
         }
-
-        for(Object latch: latches.keySet()) {
-            synchronized(latch) {
-                latch.notifyAll();
-            }
-        }
     }
-
 
     private Object get(String fieldName) {
         Transaction transaction = addToTransaction();
@@ -124,5 +118,14 @@ public class Record implements InvocationHandler {
             transaction.accessed.put(this, fieldValues);
         }
         return transaction;
+    }
+
+
+    void notifyLatches() {
+        for(Object latch: latches.keySet()) {
+            synchronized(latch) {
+                latch.notifyAll();
+            }
+        }
     }
 }
